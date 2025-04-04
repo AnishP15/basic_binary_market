@@ -11,9 +11,6 @@ from basic_binary_market.market_model.order import Order
 class BinaryMarket:
     """
     Simulates a binary (YES/NO) prediction market.
-    
-    This implementation focuses on efficient order book operations and
-    matching orders for the specific market "Will BTC reach $100k in 24 hours?"
     """
     
     def __init__(self, expiry_time: float = None):

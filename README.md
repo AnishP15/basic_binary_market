@@ -46,6 +46,7 @@ This project implements **price-time priority** (also known as FIFO - First In, 
   - **Price-Time (implemented)**: Fair, transparent, and rewards early order placement
   - **Pro-Rata**: Would distribute fills proportionally across orders at the same price, regardless of timestamp
   - **Top-of-Book**: Would only match against the best price level, potentially leaving partial executions
+
 ### Market Resolution
 
 The market resolves in a binary fashion:
@@ -54,77 +55,60 @@ The market resolves in a binary fashion:
 - **NO Resolution**: If BTC fails to reach the target price within the timeframe, all NO tokens pay out 1 unit, and YES tokens pay 0
 - **Resolution Mechanism**: The system monitors BTC price continuously and automatically resolves the market when conditions are met
 
+### Probability of resolution
+
+**Logistic Regression Model**: This project utilizes a logistic regression model to estimate the probability of resolution based on current market conditions and historical data. The logistic regression model is particularly suited for binary outcomes, making it ideal for predicting the likelihood of an event occurring (e.g., whether BTC will reach a specified price).
+
+  - **Model Structure**: The logistic regression model is defined by the logistic function:
+    \[
+    P(x) = \frac{1}{1 + e^{-(\beta_0 + \beta_1 x_1 + \beta_2 x_2 + ... + \beta_n x_n)}}
+    \]
+    where:
+    - \(P(x)\) is the predicted probability of resolution.
+    - \(x_1, x_2, ..., x_n\) are the input features (e.g., current price, time remaining, trading volume, market sentiment).
+    - \(\beta_0\) is the intercept, and \(\beta_1, \beta_2, ..., \beta_n\) are the coefficients for each feature, which are learned from historical data.
+
+  - **Input Features**: The model uses various features to predict the probability of resolution, including:
+    - **Current Price**: The current market price of BTC.
+    - **Time Remaining**: The time left until the market closes or the event is resolved.
+    - **Trading Volume**: The volume of trades occurring in the market, which can indicate market interest and liquidity.
+    - **Market Sentiment**: Sentiment analysis derived from news articles, social media, or other sources that may influence market behavior.
+
+  - **Training the Model**: The model is trained using historical data from previous prediction markets. The training process involves:
+    - Collecting historical data on BTC prices and market conditions.
+    - Labeling the data based on whether the event resolved positively (YES) or negatively (NO).
+    - Using a training algorithm (e.g., gradient descent) to optimize the coefficients (\(\beta\)) that minimize the difference between predicted probabilities and actual outcomes.
+
+  - **Probability Estimation**: Once trained, the model can be used to estimate the probability of resolution in real-time as market conditions change. The logistic function ensures that the predicted probabilities are bounded between 0 and 1, making them interpretable as probabilities.
+
+  - **Advantages**: The logistic regression model provides a smooth transition of probabilities, allowing for a realistic representation of the likelihood of a particular outcome. It is also relatively simple to implement and interpret, making it a suitable choice for this prediction market application.
+
+
 ### Alternative Approaches
 
 Several alternative approaches could have been implemented to model the probability of resolution:
 
-- **Automated Market Maker (AMM)**: Instead of a Central Limit Order Book (CLOB), an AMM could have been used, which relies on a bonding curve (like Uniswap's x*y=k). This approach requires less liquidity but may result in worse pricing due to slippage.
+- **Random Walk Model**: This model assumes that price movements are random and independent of past changes. It can be used to estimate the likelihood of reaching a certain price level over time, providing insights into the probability of an event occurring based on historical price movements.
 
-- **Dynamic Parimutuel**: This approach could implement dynamic odds that adjust based on the total money wagered on each side, providing a more fluid market response to changing conditions.
+- **Black-Scholes Model**: Originally designed for pricing options, the Black-Scholes model can be adapted to estimate the probability of resolution in prediction markets. It considers factors such as current price, strike price, volatility, and time to expiration to calculate the likelihood of an outcome.
 
-- **Logistic Model for Probability of Resolution**:
-  - In this project, we utilize a logistic model to estimate the probability of resolution based on the current market conditions and historical data. The logistic function is defined as:
-    \[
-    P(x) = \frac{1}{1 + e^{-(a + bx)}}
-    \]
-    where \(P(x)\) is the probability of resolution, \(x\) represents the input features (such as current price, time remaining, etc.), and \(a\) and \(b\) are parameters that can be tuned based on historical data.
-  - This model allows for a smooth transition of probabilities as market conditions change, providing a more realistic representation of the likelihood of a particular outcome.
 
 ## Installation
 
 1. Clone this repository:
-```bash
+```
 git clone https://github.com/yourusername/kalshi_market_making.git
 cd kalshi_market_making
 ```
-
 2. Install the required dependencies:
-```bash
+```
 pip install -r requirements.txt
 ```
-
-## Usage
-
-Run the main application:
-
-```bash
-python -m btc_prediction_market.main
+3. Run the application: 
 ```
-
-You can customize the target price and timeframe:
-
-```bash
+python -m basic_binary_market.main
+```
+4. (Optional) Customize parameters:
+```
 python -m btc_prediction_market.main --target 100000 --timeframe 24
 ```
-
-### Available Commands
-
-- `help` - Show help information
-- `limit <side> <option> <price> <size>` - Place a limit order (e.g., `limit buy yes 0.7 10`)
-- `market <side> <option> <size>` - Place a market order (e.g., `market sell no 5`)
-- `cancel <id>` - Cancel an order by ID
-- `exit` or `quit` - Exit the simulator
-
-### Order Book Display
-
-The order book display shows:
-- All buy and sell orders for both YES and NO markets
-- The bid-ask spread for each market with percentage
-- Order counts at each price level
-- Clean price formatting for better readability
-
-## Project Structure
-
-- `btc_prediction_market/main.py` - Main application module and CLI interface
-- `btc_prediction_market/market_model/` - Order matching engine and market model
-  - `binary_market.py` - Core market implementation with order matching algorithm
-  - `order.py` - Order data model and related operations
-- `btc_prediction_market/simulators/` - BTC price simulation
-  - `btc_simulator.py` - Simulates BTC price movements using stochastic processes
-  - `price_feed.py` - Provides real or simulated price data
-
-## License
-
-MIT
-
-
