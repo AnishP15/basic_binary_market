@@ -37,16 +37,15 @@ The order book is implemented as a binary market with two complementary assets (
 
 This project implements **price-time priority** (also known as FIFO - First In, First Out) matching:
 
-- **How It Works**: Orders are matched in order of price priority, and then time priority for orders at the same price.
+- **How It Works**: Orders are matched in order of price priority, and then time priority for orders at the same price. This approach is fair, transparent, and rewards early order placement
 - **Execution Rules**:
   - BUY orders match with SELL orders at the same price or lower
   - SELL orders match with BUY orders at the same price or higher
   - Older orders at the same price level are executed before newer ones
 - **Comparison with Other Algorithms**:
-  - **Price-Time (implemented)**: Fair, transparent, and rewards early order placement
   - **Pro-Rata**: Would distribute fills proportionally across orders at the same price, regardless of timestamp
   - **Top-of-Book**: Would only match against the best price level, potentially leaving partial executions
-  - - **Lead Market Maker**: This algorithm involves a designated participant (the lead market maker) who provides liquidity to the market by placing orders at various price levels. The lead market maker can help stabilize prices and ensure that there is always a market for participants to trade in. This approach can enhance market efficiency and reduce volatility by ensuring that there are always buy and sell orders available.
+  - **Lead Market Maker**: This algorithm involves a designated participant (the lead market maker) who provides liquidity to the market by placing orders at various price levels. The lead market maker can help stabilize prices and ensure that there is always a market for participants to trade in. This approach can enhance market efficiency and reduce volatility by ensuring that there are always buy and sell orders available.
 
 ### Market Resolution
 
