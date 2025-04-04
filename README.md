@@ -13,16 +13,25 @@ A binary prediction market simulator for Bitcoin price movements. This project l
 
 ## Technical Architecture
 
-### Order Book Structure
+### Order Book Architecture
 
-The order book is implemented as a binary market with two complementary assets (YES and NO):
+The order book is implemented as a binary market with two complementary assets (YES and NO). Here's a detailed breakdown of its architecture:
 
-- **Data Structure**: The core order book is organized as a dictionary of lists, separated by option type (YES/NO) and side (BUY/SELL).
-- **Order Sorting**: 
-  - BUY orders are sorted in descending order by price (highest first)
-  - SELL orders are sorted in ascending order by price (lowest first)
-- **Order Representation**: Each order contains a unique ID, price, size, user ID, and timestamp.
-- **Price Level Aggregation**: The order book summary aggregates orders at the same price level while maintaining individual order details for matching.
+- **Data Structure**: The core order book is organized as a dictionary of lists, separated by option type (YES/NO) and side (BUY/SELL). Each entry in the dictionary contains a list of orders for that specific option type and side.
+
+- **Adding Orders**:
+  - When a new order is added, it is placed in the appropriate list based on its type (BUY/SELL) and side (YES/NO).
+  - **Time Complexity**: The time complexity for adding an order is O(n) in the worst case, where n is the number of orders at the same price level.
+
+- **Order Matching**:
+  - The matching algorithm follows a price-time priority (FIFO - First In, First Out) approach. Orders are matched based on price priority first, and then by time for orders at the same price.
+  - **Execution Rules**:
+    - BUY orders match with SELL orders at the same price or lower.
+    - SELL orders match with BUY orders at the same price or higher.
+    - Older orders at the same price level are executed before newer ones.
+  - **Time Complexity**: The time complexity for matching orders is O(m) in the worst case, where m is the number of orders in the order book that need to be checked for matching.
+
+- **Price Level Aggregation**: The order book summary aggregates orders at the same price level while maintaining individual order details for matching. This allows for efficient execution and clear visibility of the market depth.
 
 ### Matching Algorithm
 
@@ -37,8 +46,6 @@ This project implements **price-time priority** (also known as FIFO - First In, 
   - **Price-Time (implemented)**: Fair, transparent, and rewards early order placement
   - **Pro-Rata**: Would distribute fills proportionally across orders at the same price, regardless of timestamp
   - **Top-of-Book**: Would only match against the best price level, potentially leaving partial executions
-  - **Direct/CLOB (implemented)**: Maintains a central limit order book with transparent matching rules
-
 ### Market Resolution
 
 The market resolves in a binary fashion:
@@ -49,10 +56,20 @@ The market resolves in a binary fashion:
 
 ### Alternative Approaches
 
-Several alternative approaches could have been implemented:
+Several alternative approaches could have been implemented to model the probability of resolution:
 
-- **Automated Market Maker (AMM)**: Instead of a CLOB, an AMM with a bonding curve (like Uniswap's x*y=k) could have been used, requiring less liquidity but potentially worse pricing
-- **Dynamic Parimutuel**: Could have implemented dynamic odds that adjust based on total money wagered on each side
+- **Automated Market Maker (AMM)**: Instead of a Central Limit Order Book (CLOB), an AMM could have been used, which relies on a bonding curve (like Uniswap's x*y=k). This approach requires less liquidity but may result in worse pricing due to slippage.
+
+- **Dynamic Parimutuel**: This approach could implement dynamic odds that adjust based on the total money wagered on each side, providing a more fluid market response to changing conditions.
+
+- **Logistic Model for Probability of Resolution**:
+  - In this project, we utilize a logistic model to estimate the probability of resolution based on the current market conditions and historical data. The logistic function is defined as:
+    \[
+    P(x) = \frac{1}{1 + e^{-(a + bx)}}
+    \]
+    where \(P(x)\) is the probability of resolution, \(x\) represents the input features (such as current price, time remaining, etc.), and \(a\) and \(b\) are parameters that can be tuned based on historical data.
+  - This model allows for a smooth transition of probabilities as market conditions change, providing a more realistic representation of the likelihood of a particular outcome.
+
 ## Installation
 
 1. Clone this repository:
