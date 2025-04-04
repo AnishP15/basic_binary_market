@@ -99,3 +99,12 @@ python -m basic_binary_market.main
 ```
 python -m btc_prediction_market.main --target 100000 --timeframe 24
 ```
+5. Interact with the order book:
+- Example of  a limit order:
+```
+limit buy no 0.6 10 
+```
+- Example of a market order:
+```
+market sell yes 15
+```
