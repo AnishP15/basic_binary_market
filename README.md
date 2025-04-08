@@ -84,8 +84,7 @@ Several alternative approaches could have been implemented to model the probabil
 
 1. Clone this repository:
 ```
-git clone https://github.com/yourusername/kalshi_market_making.git
-cd kalshi_market_making
+git clone https://github.com/yourusername/basic_binary_market.git
 ```
 2. Install the required dependencies:
 ```
